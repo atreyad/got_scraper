@@ -4,7 +4,7 @@ from lxml import html
 import requests
 import re
 import pandas as pd
-import BeautifulSoup
+from bs4 import BeautifulSoup
 
 
 #%%
@@ -55,14 +55,45 @@ for sidx, url in enumerate(seasons, start = 1):
     page = requests.get(url)
     tree = html.fromstring(page.content)
     ep_urls = tree.xpath("//div[contains(@class, 'chart_row')]/a/@href") 
-    print(ep_urls)
     for eidx, ep in enumerate(ep_urls, start = 1):
         print(sidx, eidx, ep)
         page = requests.get(ep)
+        print(page.status_code)
+        tree = BeautifulSoup(page.content)
+        good_html = tree.prettify()
+
+        # tree = html.fromstring(page.content)
+        # raw = tree.xpath("//div[contains(@class, 'lyrics')]/descendant::*/text()")
+
+        # good_html = tree.prettify()
+        # raw = tree.xpath("//div[contains(@class, 'lyrics')]/descendant::*/text()")
+
+        # tree = html.fromstring(page.content)
+
 #%%
-print(page.content)
-print(page.text)
+text = tree.get_text()
+print
+first_string = 'Lyrics'
+second_string = 'Landing'
+#fleet castle
+#everything door
+main = re.search(r'EXT.(.*?)More on Genius', text, re.DOTALL).group(1)
+
+
+list = main.split("\n\n")
+import csv
+# with open("test_output.csv", "w") as f:
+#     writer = csv.writer(f)
+#     writer.writerows(list)
+
+my_df = pd.DataFrame({'lines':list})
+my_df.head()
+my_df.to_csv('my_csv.csv', index=False, header=False)
 #%%
+# my_df.head()
+my_df.columns.values
+# speaker = my_dfstr.extract
+
 
 
 #%%
